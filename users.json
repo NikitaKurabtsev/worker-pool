@@ -20,9 +20,9 @@
     "email": "ddd@something.ru"
   },
   {
-    "id": "637893ad-605e-47c8-a8a3-3f02dd5a9df3",
-    "username": "eee",
-    "email": "eee@something.ru"
+    "id": "637893aq-605e-47c8-a8a3-3f02dd5a9df3",
+    "username": "ooo",
+    "email": "o@something.ru"
   },
   {
     "id": "afea3e76-f488-4e57-a397-f0b67e5170ce",
@@ -33,5 +33,10 @@
     "id": "015d920b-c318-4cd2-adde-9e5e8918bf7c",
     "username": "ggg",
     "email": "ggg@something.ru"
+  },
+  {
+    "id": "015d920a-c318-4cd2-adde-9e5e8918bf7c",
+    "username": "hhh",
+    "email": "hhh@something.ru"
   }
 ]

@@ -36,8 +36,8 @@ func main() {
 	go func() {
 		defer close(inputCh)
 
-		for user := range users {
-			inputCh <- users[user]
+		for _, user := range users {
+			inputCh <- user
 		}
 	}()
 
@@ -53,26 +53,27 @@ func main() {
 		close(outputCh)
 	}()
 
-	outputUsers := make([]User, 0)
-
 	// here we "consume" data to the []User slice
-	for res := range outputCh {
-		outputUsers = append(outputUsers, res.User)
+	for user := range outputCh {
+		if user.err != nil {
+			log.Printf("%v\n", user.err)
+			continue
+		}
+		fmt.Println(user)
 	}
-
-	for i := range outputUsers {
-		fmt.Println(outputUsers[i])
-	}
-
 }
 
 // addPhone returns user after mapping the username to
 // the phones.json keys to fetch user phone number
-func addPhone(user User, phones map[string]string) User {
+func addPhone(user User, phones map[string]string) (User, error) {
 	time.Sleep(1 * time.Second)
-	user.phone = phones[user.Username]
 
-	return user
+	if userPhone, ok := phones[user.Username]; ok {
+		user.phone = userPhone
+		return user, nil
+	}
+
+	return user, fmt.Errorf("cannot find phone number for user ID: %s", user.ID)
 }
 
 // processUsers use addPhone to add phone number
@@ -86,11 +87,12 @@ func processUsers(
 	defer wg.Done()
 
 	for user := range inputCh {
-		user = addPhone(user, phones)
+		var err error
+		user, err = addPhone(user, phones)
 
 		outputCh <- UserOutput{
 			User: user,
-			err:  nil,
+			err:  err,
 		}
 	}
 }
