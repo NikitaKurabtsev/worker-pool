@@ -20,6 +20,7 @@ type UserOutput struct {
 }
 
 func main() {
+	// fetch data from json files
 	users, phones, err := openDataset()
 	if err != nil {
 		log.Fatal("cannot open testing dataset: %w", err)
@@ -40,8 +41,9 @@ func main() {
 		}
 	}()
 
+	// here we process and send data from input channel
+	// to the output channel
 	wg.Add(workerCount)
-	// here we "consume" data from inputCh to outputCh
 	for w := 1; w <= workerCount; w++ {
 		go processUsers(&wg, inputCh, outputCh, phones)
 	}
@@ -53,6 +55,7 @@ func main() {
 
 	outputUsers := make([]User, 0)
 
+	// here we "consume" data to the []User slice
 	for res := range outputCh {
 		outputUsers = append(outputUsers, res.User)
 	}
@@ -63,6 +66,8 @@ func main() {
 
 }
 
+// addPhone returns user after mapping the username to
+// the phones.json keys to fetch user phone number
 func addPhone(user User, phones map[string]string) User {
 	time.Sleep(1 * time.Second)
 	user.phone = phones[user.Username]
@@ -70,7 +75,14 @@ func addPhone(user User, phones map[string]string) User {
 	return user
 }
 
-func processUsers(wg *sync.WaitGroup, inputCh <-chan User, outputCh chan<- UserOutput, phones map[string]string) {
+// processUsers use addPhone to add phone number
+// to the user struct and send result to the channel
+func processUsers(
+	wg *sync.WaitGroup,
+	inputCh <-chan User,
+	outputCh chan<- UserOutput,
+	phones map[string]string,
+) {
 	defer wg.Done()
 
 	for user := range inputCh {
